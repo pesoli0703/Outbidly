@@ -1,0 +1,1 @@
+import type {MetadataRoute} from 'next';export default function sitemap():MetadataRoute.Sitemap{const base=process.env.NEXT_PUBLIC_APP_URL;if(!base)return [];return ['','/about','/faq','/categories','/businesses','/rankings','/terms','/privacy','/refund'].map(path=>({url:base+path}))}

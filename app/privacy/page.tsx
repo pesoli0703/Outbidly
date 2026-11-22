@@ -1,0 +1,1 @@
+export default function Page(){return <div className="wrap page-body prose"><h1>Privacy <em>policy.</em></h1><p>A complete privacy policy describing data collection, retention, international transfers and user rights must be reviewed and published before launch.</p></div>}
