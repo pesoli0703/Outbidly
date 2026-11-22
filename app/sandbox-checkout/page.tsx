@@ -4,7 +4,7 @@ import {startSandboxCheckout} from './actions';
 
 export const metadata={title:'Test checkout',robots:{index:false,follow:false}};
 export const dynamic = 'force-dynamic';
-export default async function Page({searchParams}:{searchParams:Promise<{error?:string}>}) {
+export default async function Page({searchParams}:{searchParams:Promise<{error?:string;message?:string}>}) {
   if (process.env.VERCEL_ENV !== 'preview' || process.env.FLUTTERWAVE_TEST_ENABLED !== 'true') return <div className="wrap page-body"><h1>Test checkout unavailable.</h1><p>Payment testing is currently disabled.</p></div>;
   const db = await supabase(); if (!db) redirect('/login');
   const {data:{user}} = await db.auth.getUser(); if (!user) redirect('/login');
@@ -15,7 +15,7 @@ export default async function Page({searchParams}:{searchParams:Promise<{error?:
   ]);
   const q = await searchParams;
   return <div className="wrap page-body"><div className="content-card form-card"><h1>Test checkout</h1><p>This is a sandbox. Use Flutterwave test payment details only; test payments never affect public rankings. Only approved Nigerian businesses can be tested here.</p>
-    {q.error && <p className="form-error" role="alert">{q.error}</p>}
+    {q.error && <p className="form-error" role="alert">{q.error}</p>}{q.message && <p className="form-success" role="status">{q.message}</p>}
     {(businessError || categoryError) ? <p className="form-error">Could not load business details.</p> : <form action={startSandboxCheckout}>
       <label>Business</label><select name="business" required defaultValue=""><option value="" disabled>Select an approved business</option>{businesses?.filter(b=>b.country.trim().toLowerCase()==='nigeria').map(b=><option key={b.id} value={b.id}>{b.name}</option>)}</select>
       <label>Category</label><select name="category" required defaultValue=""><option value="" disabled>Select a category for this business</option>{categories?.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select>

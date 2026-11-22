@@ -42,3 +42,17 @@ test('webhook requires authentication and direct exact verification before confi
   assert.equal((await run({event:{event:'charge.completed',data:{id:'../1',tx_ref:reference}}})).status,400);
   assert.equal((await run({store:{...store,find:async()=>null}})).status,200);
 });
+
+test('return-flow verification only confirms an owner-visible exact match', async () => {
+  const {verifySandboxTransaction}=await import('../lib/payments/flutterwave-sandbox.mjs');
+  let confirms=0,verifications=0;
+  const store={find:async()=>expected,confirm:async()=>{confirms++}};
+  const provider={verify:async()=>{verifications++;return verification}};
+  assert.equal((await verifySandboxTransaction({reference,id:'123',provider,store})).status,200);
+  assert.equal(confirms,1);
+  assert.equal((await verifySandboxTransaction({reference,id:'../123',provider,store})).status,400);
+  assert.equal((await verifySandboxTransaction({reference,id:'123',provider,store:{...store,find:async()=>null}})).status,404);
+  assert.equal(verifications,1);
+  assert.equal((await verifySandboxTransaction({reference,id:'123',provider:{verify:async()=>({...verification,data:{...verification.data,currency:'USD'}})},store})).status,422);
+  assert.equal(confirms,1);
+});

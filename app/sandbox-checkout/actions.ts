@@ -15,7 +15,7 @@ export async function startSandboxCheckout(form: FormData) {
   if (!/^(?:0|[1-9]\d{0,9})(?:\.\d{1,2})?$/.test(amount) || form.get('policy') !== 'accepted') redirect('/sandbox-checkout?error=Check+the+amount+and+policy');
   const key = process.env.FLUTTERWAVE_SECRET_KEY;
   const base = process.env.NEXT_PUBLIC_APP_URL;
-  if (!key || !base || !/^FLWSECK_TEST-[A-Za-z0-9-]+$/.test(key)) redirect('/sandbox-checkout?error=Test+checkout+is+not+configured');
+  if (!key || !base || !process.env.SUPABASE_SERVICE_ROLE_KEY || !/^FLWSECK_TEST-[A-Za-z0-9-]+$/.test(key)) redirect('/sandbox-checkout?error=Test+checkout+is+not+configured');
   let redirectUrl: string;
   try {const u = new URL(base); if(u.protocol !== 'https:' || u.username || u.password || u.pathname !== '/' || u.search || u.hash) throw Error(); redirectUrl = new URL('/sandbox-checkout/return',u).href;} catch {redirect('/sandbox-checkout?error=Test+checkout+is+not+configured');}
   const {data,error} = await db.rpc('create_sandbox_payment_intent',{p_business_id:business,p_category_id:category,p_amount:amount,p_policy_accepted:true}).single();

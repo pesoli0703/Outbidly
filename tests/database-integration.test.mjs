@@ -22,7 +22,7 @@ async function setup() {
     grant select,insert on storage.objects to authenticated;
     alter default privileges in schema public grant select,insert,update,delete on tables to anon,authenticated,service_role;
   `);
-  const migrations = ['20261122120240_foundation.sql','20261122120327_category_and_notifications.sql','20261122120451_restrict_private_function_execution.sql','20261122132649_business_privacy_and_validation.sql','20261123000001_sandbox_payment_intents.sql'];
+  const migrations = ['20261122120240_foundation.sql','20261122120327_category_and_notifications.sql','20261122120451_restrict_private_function_execution.sql','20261122132649_business_privacy_and_validation.sql','20261122143502_sandbox_payment_intents.sql'];
   for (const name of migrations) {
     const sql = await readFile(`supabase/migrations/${name}`, 'utf8');
     // gen_random_uuid() is built into PostgreSQL; PGlite does not ship pgcrypto.
