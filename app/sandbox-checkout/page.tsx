@@ -15,7 +15,8 @@ export default async function Page({searchParams}:{searchParams:Promise<{error?:
   ]);
   const q = await searchParams;
   return <div className="wrap page-body"><div className="content-card form-card"><h1>Test checkout</h1><p>This is a sandbox. Use Flutterwave test payment details only; test payments never affect public rankings. Only approved Nigerian businesses can be tested here.</p>
-    {q.error && <p className="form-error" role="alert">{q.error}</p>}{q.message && <p className="form-success" role="status">{q.message}</p>}
+    {q.error && <div role="alert" style={{background:'#fee',border:'2px solid #c00',color:'#900',padding:'16px 20px',borderRadius:8,marginBottom:20,fontSize:16,fontWeight:700}}>⚠️ {q.error}</div>}
+    {q.message && <p className="form-success" role="status">{q.message}</p>}
     {(businessError || categoryError) ? <p className="form-error">Could not load business details.</p> : <form action={startSandboxCheckout}>
       <label>Business</label><select name="business" required defaultValue=""><option value="" disabled>Select an approved business</option>{businesses?.filter(b=>b.country.trim().toLowerCase()==='nigeria').map(b=><option key={b.id} value={b.id}>{b.name}</option>)}</select>
       <label>Category</label><select name="category" required defaultValue=""><option value="" disabled>Select a category for this business</option>{categories?.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select>
