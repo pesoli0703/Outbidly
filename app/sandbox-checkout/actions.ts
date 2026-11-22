@@ -34,7 +34,7 @@ export async function startSandboxCheckout(form: FormData) {
   console.log('[checkout] intent created:', intent.reference, intent.amount);
   let link: string;
   try { link = await createSandboxFlutterwave({secretKey:key}).checkout({reference:intent.reference,amount:String(intent.amount),email:user.email,redirectUrl}); }
-  catch (e) { console.error('[checkout] Flutterwave failed:', e); redirect('/sandbox-checkout?error=Unable+to+start+test+checkout.+Please+try+again.'); }
+  catch (e) { const msg = e instanceof Error ? e.message : String(e); console.error('[checkout] Flutterwave failed:', msg); redirect('/sandbox-checkout?error=' + encodeURIComponent(msg)); }
   console.log('[checkout] redirecting to', link);
   redirect(link);
 }
