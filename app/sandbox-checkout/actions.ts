@@ -23,7 +23,7 @@ export async function startSandboxCheckout(form: FormData) {
   const base = process.env.NEXT_PUBLIC_APP_URL;
   if (!key) { console.error('[checkout] missing FLUTTERWAVE_SECRET_KEY'); redirect('/sandbox-checkout?error=Flutterwave+key+is+not+set'); }
   if (!base) { console.error('[checkout] missing NEXT_PUBLIC_APP_URL'); redirect('/sandbox-checkout?error=App+URL+is+not+set'); }
-  if (!/^FLWSECK_TEST-[A-Za-z0-9-]+$/.test(key)) { console.error('[checkout] bad key format:', key.slice(0,14)+'...'); redirect('/sandbox-checkout?error=Flutterwave+key+has+wrong+format+(must+start+with+FLWSECK_TEST-)'); }
+  if (!/^FLWSECK[-_][A-Za-z0-9-]+$/.test(key)) { console.error('[checkout] bad key format:', key.slice(0,14)+'...'); redirect('/sandbox-checkout?error=Flutterwave+key+has+wrong+format+(must+start+with+FLWSECK-)'); }
   let redirectUrl: string;
   try {const u = new URL(base); if(u.protocol !== 'https:' || u.username || u.password || u.pathname !== '/' || u.search || u.hash) throw Error(); redirectUrl = new URL('/sandbox-checkout/return',u).href;}
   catch (e) { console.error('[checkout] bad app URL:', base, e); redirect('/sandbox-checkout?error=Test+checkout+URL+is+not+configured'); }
