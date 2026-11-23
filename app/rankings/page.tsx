@@ -1,3 +1,88 @@
-import Link from 'next/link';import {Trophy} from 'lucide-react';import {categories} from '@/lib/categories';import {supabase} from '@/lib/supabase';
-export const metadata={title:'Leaderboards'};
-export default async function Page({searchParams}:{searchParams:Promise<{category?:string;period?:string;scope?:string;country?:string;city?:string;search?:string}>}){const q=await searchParams;const category=q.category||'Fashion Designers',period=['daily','weekly','monthly','lifetime'].includes(q.period||'')?q.period!:'lifetime',scope=['global','country','city'].includes(q.scope||'')?q.scope!:'global';const db=await supabase();const categoryResult=db?await db.from('categories').select('name').eq('active',true).order('name'):{data:null};const categoryNames=categoryResult.data?.map(c=>c.name)??categories;let rows: any[]=[];let error='';if(db){const result=await db.rpc('public_leaderboard',{p_category:category,p_period:period,p_scope:scope,p_country:q.country||null,p_city:q.city||null,p_search:q.search||null});rows=result.data||[];if(result.error)error='Rankings are temporarily unavailable.'}else error='Rankings are unavailable until the database is configured.';return <><div className="page-hero"><div className="wrap"><div className="eyebrow">✦ DISCOVER THE LEADERBOARDS</div><h1>Ambition has <em>a place here.</em></h1><p>Explore businesses competing for visibility, from your city to the world.</p></div></div><div className="wrap page-body"><form className="filters"><select name="category" defaultValue={category} aria-label="Category">{categoryNames.map(c=><option key={c}>{c}</option>)}</select><select name="scope" defaultValue={scope} aria-label="Geographic scope"><option value="global">Global</option><option value="country">Country</option><option value="city">City</option></select><select name="period" defaultValue={period} aria-label="Ranking period"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="lifetime">Lifetime</option></select><input name="country" defaultValue={q.country} placeholder="Country"/><input name="city" defaultValue={q.city} placeholder="City"/><input name="search" defaultValue={q.search} placeholder="Search businesses"/><button className="button dark">Apply filters</button></form><div className="notice">Rankings reflect accumulated verified payments, not quality, customer satisfaction or an endorsement. One payment contributes to all relevant geographic scopes and periods.</div><div className="content-card"><div className="leaderboard-title"><div><span className="mini-icon"><Trophy size={19}/></span><span><strong>{category}</strong><small>{scope} · {period} · UTC</small></span></div></div>{error?<div className="center-empty"><Trophy/><h3>{error}</h3><p>Please check back later.</p></div>:rows.length===0?<div className="center-empty"><Trophy/><h3>No rankings to show yet.</h3><p>Try another category or location, or be the first to compete.</p><Link className="text-link" style={{display:'inline-flex',marginTop:15}} href="/register">Register your business →</Link></div>:rows.map((r,i)=><div className="rank-row" key={r.business_id}><strong>#{i+1}</strong><Link href={'/business/'+r.slug}>{r.name} ↗</Link><span>{r.city}, {r.country}</span><strong>{r.currency} {r.total}</strong></div>)}</div></div></>}
+import Link from 'next/link';
+import { Trophy } from 'lucide-react';
+import { categories } from '@/lib/categories';
+import { supabase } from '@/lib/supabase';
+import { RankBadge } from '@/components/rank-badge';
+
+export const metadata = { title: 'Leaderboards' };
+
+export default async function Page({ searchParams }: { searchParams: Promise<{ category?: string; period?: string; scope?: string; country?: string; city?: string; search?: string }> }) {
+  const q = await searchParams;
+  const category = q.category || 'Fashion Designers',
+    period = ['daily', 'weekly', 'monthly', 'lifetime'].includes(q.period || '') ? q.period! : 'lifetime',
+    scope = ['global', 'country', 'city'].includes(q.scope || '') ? q.scope! : 'global';
+  const db = await supabase();
+  const categoryResult = db ? await db.from('categories').select('name').eq('active', true).order('name') : { data: null };
+  const categoryNames = categoryResult.data?.map(c => c.name) ?? categories;
+
+  let rows: any[] = [];
+  let error = '';
+  if (db) {
+    const result = await db.rpc('public_leaderboard_with_rank', {
+      p_category: category,
+      p_period: period,
+      p_scope: scope,
+      p_country: q.country || null,
+      p_city: q.city || null,
+      p_search: q.search || null,
+    });
+    rows = result.data || [];
+    if (result.error) error = 'Rankings are temporarily unavailable.';
+  } else error = 'Rankings are unavailable until the database is configured.';
+
+  return (
+    <>
+      <div className="page-hero">
+        <div className="wrap">
+          <div className="eyebrow">✦ DISCOVER THE LEADERBOARDS</div>
+          <h1>Ambition has <em>a place here.</em></h1>
+          <p>Explore businesses competing for visibility, from your city to the world.</p>
+        </div>
+      </div>
+      <div className="wrap page-body">
+        <form className="filters">
+          <select name="category" defaultValue={category} aria-label="Category">
+            {categoryNames.map(c => <option key={c}>{c}</option>)}
+          </select>
+          <select name="scope" defaultValue={scope} aria-label="Geographic scope">
+            <option value="global">Global</option>
+            <option value="country">Country</option>
+            <option value="city">City</option>
+          </select>
+          <select name="period" defaultValue={period} aria-label="Ranking period">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="lifetime">Lifetime</option>
+          </select>
+          <input name="country" defaultValue={q.country} placeholder="Country" />
+          <input name="city" defaultValue={q.city} placeholder="City" />
+          <input name="search" defaultValue={q.search} placeholder="Search businesses" />
+          <button className="button dark">Apply filters</button>
+        </form>
+        <div className="notice">Rankings reflect accumulated verified payments, not quality, customer satisfaction or an endorsement. Top 10 earners receive rank badges — Gold, Silver, Bronze and Top 10.</div>
+        <div className="content-card">
+          <div className="leaderboard-title">
+            <div>
+              <span className="mini-icon"><Trophy size={19} /></span>
+              <span><strong>{category}</strong><small>{scope} · {period} · UTC</small></span>
+            </div>
+          </div>
+          {error
+            ? <div className="center-empty"><Trophy /><h3>{error}</h3><p>Please check back later.</p></div>
+            : rows.length === 0
+              ? <div className="center-empty"><Trophy /><h3>No rankings to show yet.</h3><p>Try another category or location, or be the first to compete.</p><Link className="text-link" style={{ display: 'inline-flex', marginTop: 15 }} href="/register">Register your business →</Link></div>
+              : rows.map((r: any) => (
+                <div className="rank-row" key={r.business_id}>
+                  <RankBadge rank={r.rank} />
+                  <Link href={'/business/' + r.slug} style={{ fontWeight: r.rank <= 3 ? 700 : 400 }}>{r.name} ↗</Link>
+                  <span>{r.city}, {r.country}</span>
+                  <strong>{r.currency} {Number(r.total).toLocaleString('en-NG', { minimumFractionDigits: 2 })}</strong>
+                </div>
+              ))
+          }
+        </div>
+      </div>
+    </>
+  );
+}
