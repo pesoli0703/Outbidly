@@ -183,3 +183,161 @@
   .landing-price-tag{font-size:34px}
   .landing-how-head h2{font-size:28px}
 }
+
+/* === GLOBAL BUSINESS DIRECTORY === */
+.gbd-page{background:#f8f8f5;min-height:100vh}
+.gbd-hero{background:#142433;color:#fff;padding:60px 24px 50px;text-align:center}
+.gbd-hero-inner{max-width:900px;margin:0 auto}
+.gbd-hero h1{font-family:Manrope,sans-serif;font-size:clamp(36px,5vw,56px);line-height:1.1;letter-spacing:-2.5px;margin:20px auto 15px;font-weight:700}
+.gbd-hero h1 em{font-family:Georgia,serif;font-weight:400;color:#e8c65a}
+.gbd-hero p{color:#8b959e;font-size:15px;line-height:1.7;max-width:600px;margin:0 auto 25px}
+.gbd-hero-stats{display:flex;justify-content:center;gap:40px;margin-top:25px}
+.gbd-hero-stats>div{display:flex;flex-direction:column}
+
+/* Tabs */
+.gbd-tabs-section{background:#fff;border-bottom:1px solid #e5e7e5;padding:0 24px}
+.gbd-tabs{display:flex;gap:0;max-width:1200px;margin:0 auto;overflow-x:auto}
+.gbd-tab{display:flex;align-items:center;gap:8px;padding:14px 20px;font-size:13px;font-weight:700;color:#6b7580;border-bottom:2px solid transparent;white-space:nowrap;transition:.2s}
+.gbd-tab:hover{color:#182b3a}
+.gbd-tab.active{color:#182b3a;border-color:#c49a58}
+
+/* Filters */
+.gbd-filters-section{max-width:1200px;margin:0 auto;padding:20px 24px}
+.gbd-filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.gbd-search-wrap{display:flex;align-items:center;gap:8px;flex:1;min-width:250px;background:#fff;border:1px solid #e1e5df;border-radius:6px;padding:10px 14px}
+.gbd-search{border:none;outline:none;flex:1;font-size:13px;background:transparent}
+.gbd-search-wrap svg{color:#8a9698;flex:none}
+.gbd-select{background:#fff;border:1px solid #e1e5df;border-radius:6px;padding:10px 14px;font-size:13px;min-width:150px}
+
+/* Results */
+.gbd-results{max-width:1200px;margin:0 auto;padding:10px 24px 40px}
+.gbd-section-title{font-size:16px;font-weight:800;color:#182b3a;margin:25px 0 15px;display:flex;align-items:center;gap:8px}
+.gbd-section-title svg{color:#c49a58}
+.gbd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+
+/* Company Card */
+.gbd-card{background:#fff;border:1px solid #e7e9e3;border-radius:10px;padding:20px;text-decoration:none;transition:.2s;display:block}
+.gbd-card:hover{border-color:#c49a58;transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.04)}
+.gbd-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.gbd-card-logo{width:48px;height:48px;border-radius:10px;background:#f1eadc;display:grid;place-items:center;font-weight:800;font-size:14px;color:#9a7948;overflow:hidden;flex:none}
+.gbd-card-logo img{width:100%;height:100%;object-fit:cover}
+.gbd-badge{font-size:9px;font-weight:800;letter-spacing:.5px;padding:3px 8px;border-radius:4px}
+.gbd-badge-unclaimed{background:#f1f5f9;color:#475569}
+.gbd-badge-verified{background:#dcfce7;color:#166534;display:flex;align-items:center;gap:3px}
+.gbd-card-name{font-size:15px;font-weight:700;color:#182b3a;margin:0 0 6px;display:flex;align-items:center;gap:4px}
+.gbd-card-desc{font-size:12px;color:#6b7580;line-height:1.5;margin:0 0 12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.gbd-card-meta{display:flex;gap:12px;font-size:11px;color:#8a9698;margin-bottom:8px}
+.gbd-card-meta span{display:flex;align-items:center;gap:3px}
+.gbd-card-industry{font-size:10px;font-weight:700;color:#c49a58;letter-spacing:.5px;text-transform:uppercase}
+
+/* Empty state */
+.gbd-empty{text-align:center;padding:60px 24px;color:#6b7580}
+.gbd-empty svg{color:#c49a58;margin-bottom:16px}
+.gbd-empty h3{font-size:18px;color:#182b3a;margin:0 0 8px}
+.gbd-empty p{font-size:13px}
+
+/* Disclaimer */
+.gbd-disclaimer{max-width:1200px;margin:0 auto;padding:20px 24px 40px;font-size:11px;color:#8a9698;line-height:1.6;border-top:1px solid #e5e7e5}
+
+/* === GLOBAL COMPANY PROFILE === */
+.gcp-page{background:#f8f8f5;min-height:100vh;padding-bottom:60px}
+.gcp-breadcrumb{max-width:1040px;margin:0 auto;padding:20px 24px;font-size:12px;color:#8a9698;display:flex;align-items:center;gap:8px}
+.gcp-breadcrumb a{color:#c49a58;font-weight:600}
+.gcp-breadcrumb a:hover{text-decoration:underline}
+
+.gcp-header{max-width:1040px;margin:0 auto;padding:0 24px 30px}
+.gcp-header-inner{background:#fff;border:1px solid #e7e9e3;border-radius:14px;padding:30px;display:flex;gap:25px;align-items:flex-start}
+.gcp-logo-wrap{flex:none}
+.gcp-logo{width:80px;height:80px;border-radius:14px;object-fit:cover;background:#f1eadc}
+.gcp-logo-placeholder{width:80px;height:80px;border-radius:14px;background:#142433;color:#f0c850;display:grid;place-items:center;font-weight:800;font-size:28px;font-family:Manrope,sans-serif}
+.gcp-header-info{flex:1;min-width:0}
+.gcp-status-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.gcp-status-row h1{font-family:Manrope,sans-serif;font-size:28px;letter-spacing:-1px;margin:0;font-weight:700}
+.gcp-status{font-size:11px;font-weight:700;padding:4px 12px;border-radius:5px;display:inline-flex;align-items:center;gap:5px}
+.gcp-status-unclaimed{background:#f1f5f9;color:#475569}
+.gcp-status-claimed{background:#fef3c7;color:#92400e}
+.gcp-status-verified{background:#dcfce7;color:#166534}
+.gcp-description{font-size:14px;color:#5a6a78;line-height:1.6;margin:0 0 15px}
+.gcp-meta-row{display:flex;gap:18px;flex-wrap:wrap}
+.gcp-meta{font-size:12px;color:#8a9698;display:flex;align-items:center;gap:5px}
+.gcp-meta svg{color:#c49a58}
+
+/* Actions */
+.gcp-actions{max-width:1040px;margin:0 auto;padding:0 24px 25px;display:flex;gap:12px;flex-wrap:wrap}
+.gcp-action-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;transition:.2s}
+.gcp-action-primary{background:#142433;color:#f0c850}
+.gcp-action-primary:hover{background:#1e3448}
+.gcp-action-claim{background:#f0c850;color:#1a1207}
+.gcp-action-claim:hover{background:#ffd85a}
+
+/* Details */
+.gcp-details{max-width:1040px;margin:0 auto;padding:0 24px 25px;display:grid;grid-template-columns:1.5fr 1fr;gap:16px}
+.gcp-detail-card{background:#fff;border:1px solid #e7e9e3;border-radius:10px;padding:22px}
+.gcp-detail-card h3{font-size:14px;font-weight:700;margin:0 0 15px;color:#182b3a}
+.gcp-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gcp-detail-grid>div{display:flex;flex-direction:column;gap:3px}
+.gcp-detail-grid strong{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:#8a9698;font-weight:700}
+.gcp-detail-grid span{font-size:13px;color:#3a4a5a}
+.gcp-detail-grid a{color:#c49a58;display:inline-flex;align-items:center;gap:3px}
+.gcp-tags{display:flex;flex-wrap:wrap;gap:6px}
+.gcp-tag{background:#f1eadc;color:#8a6d35;font-size:11px;font-weight:600;padding:5px 12px;border-radius:99px}
+
+/* Status info */
+.gcp-status-info{max-width:1040px;margin:0 auto;padding:0 24px 25px}
+.gcp-info-box{display:flex;gap:15px;padding:18px 20px;border-radius:10px;align-items:flex-start}
+.gcp-info-box svg{flex:none;margin-top:2px}
+.gcp-info-box h4{font-size:14px;margin:0 0 5px}
+.gcp-info-box p{font-size:12px;line-height:1.6;margin:0}
+.gcp-info-box a{font-weight:700;text-decoration:underline}
+.gcp-info-unclaimed{background:#f1f5f9;border:1px solid #e2e8f0}
+.gcp-info-unclaimed svg{color:#64748b}
+.gcp-info-verified{background:#dcfce7;border:1px solid #bbf7d0}
+.gcp-info-verified svg{color:#16a34a}
+
+/* Competition CTA */
+.gcp-competition-cta{max-width:1040px;margin:0 auto;padding:0 24px 30px;text-align:center;background:linear-gradient(135deg,#142433,#1e3448);border-radius:14px;padding:40px 30px;color:#fff}
+.gcp-competition-cta h3{font-family:Manrope,sans-serif;font-size:22px;letter-spacing:-1px;margin:0 0 10px}
+.gcp-competition-cta p{color:#8b959e;font-size:13px;line-height:1.6;max-width:500px;margin:0 auto 20px}
+
+/* === CLAIM BUSINESS PAGE === */
+.claim-hero{margin-bottom:25px}
+.claim-hero h1{font-family:Manrope,sans-serif;font-size:36px;letter-spacing:-1.5px;margin:12px 0 10px}
+.claim-hero h1 em{font-family:Georgia,serif;font-weight:400;color:#b88e4d}
+.claim-hero p{color:#6b7580;font-size:14px;line-height:1.6;max-width:600px;margin:0}
+
+.claim-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:25px;align-items:flex-start}
+.claim-form-wrap{background:#fff;border:1px solid #e7e9e3;border-radius:12px;padding:30px}
+.claim-form h3{font-size:15px;font-weight:700;margin:0 0 15px;color:#182b3a}
+.claim-form label{display:block;font-size:11px;font-weight:700;color:#65757b;margin:12px 0 5px}
+.claim-form input,.claim-form textarea{width:100%;border:1px solid #e1e5df;border-radius:6px;padding:11px;font-size:13px;background:#fff}
+.claim-hint{font-size:10px;color:#8a9698;margin:4px 0 0}
+
+.claim-notice{display:flex;gap:12px;background:#f5f0e3;border:1px solid #ede5d0;border-radius:8px;padding:14px;margin-top:20px}
+.claim-notice svg{color:#b78d50;flex:none;margin-top:2px}
+.claim-notice strong{display:block;font-size:12px;margin-bottom:4px}
+.claim-notice p{font-size:11px;line-height:1.5;color:#6b5d45;margin:0}
+
+.claim-sidebar .content-card{background:#fff}
+.claim-sidebar h3{font-size:14px;font-weight:700;margin:0 0 12px}
+.claim-sidebar p{font-size:12px;color:#6b7580;line-height:1.5;margin:0 0 10px}
+.claim-benefits,.claim-requirements{list-style:none;padding:0;margin:0}
+.claim-benefits li,.claim-requirements li{font-size:12px;padding:5px 0;color:#3a4a5a}
+
+/* Responsive */
+@media(max-width:900px){
+  .gcp-header-inner{flex-direction:column}
+  .gcp-details{grid-template-columns:1fr}
+  .claim-grid{grid-template-columns:1fr}
+  .gbd-hero-stats{gap:25px}
+}
+@media(max-width:600px){
+  .gbd-hero{padding:40px 16px}
+  .gbd-hero h1{font-size:32px}
+  .gbd-tabs{padding:0}
+  .gbd-tab{padding:12px 14px;font-size:12px}
+  .gbd-grid{grid-template-columns:1fr}
+  .gcp-header-inner{padding:20px}
+  .gcp-status-row h1{font-size:22px}
+  .gcp-detail-grid{grid-template-columns:1fr}
+  .claim-form-wrap{padding:20px}
+}
