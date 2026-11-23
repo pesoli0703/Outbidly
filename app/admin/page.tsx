@@ -8,12 +8,13 @@ export default async function Page({searchParams}:{searchParams:Promise<{error?:
  const {data:{user}}=await db.auth.getUser();if(!user)redirect('/login');
  const {data:role}=await db.from('user_roles').select('role').eq('user_id',user.id).eq('role','admin').maybeSingle();
  if(!role)return <div className="wrap page-body"><h1>Access denied.</h1></div>;
- const [businessResult,categoryResult,companiesResult,claimsResult,industriesResult]=await Promise.all([
+ const [businessResult,categoryResult,companiesResult,claimsResult,industriesResult,paymentsResult]=await Promise.all([
   db.from('businesses').select('*').in('status',['pending','approved','rejected','suspended']).order('created_at',{ascending:false}),
   db.from('categories').select('id,name,description,active').order('name'),
   db.from('global_companies').select('*,global_industries(name)').order('is_featured',{ascending:false}).order('name'),
   db.from('company_claims').select('*,global_companies(name,slug)').order('created_at',{ascending:false}),
   db.from('global_industries').select('*').order('display_order'),
+  db.from('payment_intents').select('*,businesses(name,slug,city,country),user:user_id(email)').order('created_at',{ascending:false}).limit(100),
  ]);
  const tab=q.tab||'businesses';
  return <div className="wrap page-body">
@@ -21,8 +22,9 @@ export default async function Page({searchParams}:{searchParams:Promise<{error?:
  {q.error&&<p className="form-error" role="alert">{q.error}</p>}{q.message&&<p className="form-success">{q.message}</p>}
 
  {/* Tab navigation */}
- <nav style={{display:'flex',gap:8,margin:'20px 0',borderBottom:'1px solid #e5e7e5',paddingBottom:0}}>
+ <nav style={{display:'flex',gap:8,margin:'20px 0',borderBottom:'1px solid #e5e7e5',paddingBottom:0,flexWrap:'wrap'}}>
   <a href="/admin?tab=businesses" style={{padding:'12px 18px',fontWeight:700,fontSize:13,borderBottom:tab==='businesses'?'2px solid #c49a58':'2px solid transparent',color:tab==='businesses'?'#182b3a':'#84908e'}}>Business Reviews</a>
+  <a href="/admin?tab=payments" style={{padding:'12px 18px',fontWeight:700,fontSize:13,borderBottom:tab==='payments'?'2px solid #c49a58':'2px solid transparent',color:tab==='payments'?'#182b3a':'#84908e'}}>Payments {paymentsResult.data?.filter(p=>p.status==='verified').length?`(${paymentsResult.data?.filter(p=>p.status==='verified').length})`:''}</a>
   <a href="/admin?tab=claims" style={{padding:'12px 18px',fontWeight:700,fontSize:13,borderBottom:tab==='claims'?'2px solid #c49a58':'2px solid transparent',color:tab==='claims'?'#182b3a':'#84908e'}}>Claim Requests {claimsResult.data?.filter(c=>c.status==='pending').length?`(${claimsResult.data?.filter(c=>c.status==='pending').length})`:''}</a>
   <a href="/admin?tab=directory" style={{padding:'12px 18px',fontWeight:700,fontSize:13,borderBottom:tab==='directory'?'2px solid #c49a58':'2px solid transparent',color:tab==='directory'?'#182b3a':'#84908e'}}>Global Directory</a>
   <a href="/admin?tab=industries" style={{padding:'12px 18px',fontWeight:700,fontSize:13,borderBottom:tab==='industries'?'2px solid #c49a58':'2px solid transparent',color:tab==='industries'?'#182b3a':'#84908e'}}>Directory Categories</a>
@@ -35,6 +37,35 @@ export default async function Page({searchParams}:{searchParams:Promise<{error?:
   {businessResult.error&&<p className="form-error">Businesses could not be loaded.</p>}
   {businessResult.data?.map(b=><div className="content-card" style={{marginBottom:14}} key={b.id}><h3>{b.name} · {b.status}</h3><p>{b.city}, {b.country} · {b.business_type}</p><p>{b.description}</p><p>{b.address} · {b.email} · {b.phone}</p>{b.logo_url&&<img src={b.logo_url.startsWith('https://')?b.logo_url:db.storage.from('business-logos').getPublicUrl(b.logo_url).data.publicUrl} alt="" width="90" style={{marginTop:8}}/>}<form action={review} className="filters" style={{marginTop:10}}><input type="hidden" name="id" value={b.id}/><select name="status" aria-label="Decision"><option value="approved">Approve</option><option value="rejected">Reject</option><option value="suspended">Suspend</option></select><input name="note" placeholder="Reason or internal note" aria-label="Reason" required/><button className="button dark">Record decision</button></form></div>)}
   {!businessResult.error&&!businessResult.data?.length&&<div className="content-card">No businesses to review.</div>}
+ </section>}
+
+ {/* Payments Tab */}
+ {tab==='payments' && <section>
+  <h2>Payment <em>transactions.</em></h2><p>Track all payment intents and their verification status. Verified payments boost business rankings on the leaderboard.</p>
+  {paymentsResult.error&&<p className="form-error">Payments could not be loaded.</p>}
+  {paymentsResult.data?.map(p=>{
+    const business=(p as any).businesses;
+    const user=(p as any).user;
+    const isVerified=p.status==='verified';
+    const isPending=p.status==='pending';
+    return <div className="content-card" style={{marginBottom:12,borderLeft:isVerified?'4px solid #4ade80':isPending?'4px solid #c49a58':'4px solid #ef4444'}} key={p.id}>
+     <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:10}}>
+      <div>
+       <h3 style={{margin:0}}>₦{Number(p.amount).toLocaleString('en-NG',{minimumFractionDigits:2})} <span style={{fontSize:11,padding:'3px 10px',borderRadius:4,background:isVerified?'#dcfce7':isPending?'#fef3c7':'#fee2e2',color:isVerified?'#166534':isPending?'#92400e':'#991b1b',marginLeft:10,verticalAlign:'middle'}}>{p.status.toUpperCase()}</span></h3>
+       {business&&<p style={{margin:'4px 0',fontSize:13,color:'#555'}}>{business.name} — {business.city}, {business.country}</p>}
+       {user&&<p style={{margin:'2px 0',fontSize:12,color:'#888'}}>User: {user.email}</p>}
+      </div>
+     </div>
+     <div style={{marginTop:10,fontSize:12,color:'#6b7580',display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:8}}>
+      <div><strong>Reference:</strong> {p.reference}</div>
+      {p.transaction_id&&<div><strong>Transaction ID:</strong> {p.transaction_id}</div>}
+      <div><strong>Currency:</strong> {p.currency}</div>
+      <div><strong>Created:</strong> {new Date(p.created_at).toLocaleString()}</div>
+      {p.verified_at&&<div><strong>Verified:</strong> {new Date(p.verified_at).toLocaleString()}</div>}
+     </div>
+    </div>;
+  })}
+  {!paymentsResult.error&&!paymentsResult.data?.length&&<div className="content-card">No payment transactions yet. Payments will appear here once businesses start boosting their rankings.</div>}
  </section>}
 
  {/* Claim Requests Tab */}
