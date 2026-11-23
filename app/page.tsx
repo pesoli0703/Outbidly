@@ -42,9 +42,9 @@ export default async function HomePage({searchParams}:{searchParams:Promise<Sear
   return <div className="landing">
     {/* Top bar — pay to rank */}
     <div className="landing-ribbon">
-      <span><Zap size={13}/> <strong>PAY TO RANK</strong></span>
-      <span>₦2,000 minimum to claim a spot on the leaderboard</span>
-      <Link href="/register" className="landing-ribbon-cta">Register now <ArrowUpRight size={13}/></Link>
+      <span><Zap size={13}/> <strong>REGISTER FREE · PAY TO STAY VISIBLE</strong></span>
+      <span>Your business gets discovered on the leaderboard. Keep paying to stay on top.</span>
+      <Link href="/register" className="landing-ribbon-cta">Register free <ArrowUpRight size={13}/></Link>
     </div>
 
     {/* Hero — the leaderboard IS the hero */}
@@ -52,16 +52,16 @@ export default async function HomePage({searchParams}:{searchParams:Promise<Sear
       <div className="landing-hero-inner">
         <div className="landing-hero-left">
           <div className="landing-eyebrow"><Trophy size={14}/> LIVE LEADERBOARD</div>
-          <h1>Who's <em>on top?</em></h1>
-          <p>Real-time rankings powered by verified payments. Every naira counts. Climb the board or get left behind.</p>
+          <h1>Register free.<br/><em>Bid to stay on top.</em></h1>
+          <p>Your business gets a free profile and appears on the leaderboard. Pay to boost your position and stay visible to customers. The more you invest, the higher you climb.</p>
           <div className="landing-hero-stats">
-            <div><span className="landing-stat-num">{filledSlots}</span><span className="landing-stat-label">Businesses ranked</span></div>
+            <div><span className="landing-stat-num">₦0</span><span className="landing-stat-label">Registration</span></div>
             <div><span className="landing-stat-num">{openSlots > 0 ? openSlots : 0}</span><span className="landing-stat-label">Open top-10 spots</span></div>
-            <div><span className="landing-stat-num">₦2k</span><span className="landing-stat-label">Minimum to rank</span></div>
+            <div><span className="landing-stat-num">₦2k</span><span className="landing-stat-label">Starts from</span></div>
           </div>
           <div className="landing-hero-actions">
-            <Link className="btn-gold" href="/register"><Flame size={15}/> Rank your business</Link>
-            <Link className="btn-ghost" href="#leaderboard">View full rankings</Link>
+            <Link className="btn-gold" href="/register"><Flame size={15}/> Register & get visible</Link>
+            <Link className="btn-ghost" href="#leaderboard">See who's ranked</Link>
           </div>
         </div>
         <div className="landing-hero-right">
@@ -102,10 +102,10 @@ export default async function HomePage({searchParams}:{searchParams:Promise<Sear
       <div className="landing-board-head">
         <div>
           <div className="eyebrow">✦ THE STANDINGS</div>
-          <h2>Current <em>rankings.</em></h2>
-          <p>See every business competing for visibility. Top 10 get badges. Pay to climb.</p>
+          <h2>Who's <em>on top right now.</em></h2>
+          <p>These businesses registered free — then paid to climb and stay visible. Top 10 earn badges. Will you overtake them?</p>
         </div>
-        <Link className="btn-dark-sm" href="/register"><Sparkles size={14}/> Pay to rank →</Link>
+        <Link className="btn-dark-sm" href="/register"><Sparkles size={14}/> Register free →</Link>
       </div>
 
       {/* Filters */}
@@ -133,8 +133,8 @@ export default async function HomePage({searchParams}:{searchParams:Promise<Sear
          unavailable ? <div className="landing-empty"><Trophy size={28}/><h3>Rankings temporarily unavailable</h3><p>Please try again shortly.</p></div> :
          leaders.length === 0 ? <div className="landing-empty">
           <Crown size={32}/>
-          <h3>The top spot is waiting.</h3>
-          <p>No businesses ranked in this view yet. Be the first to claim it — just ₦2,000 to start.</p>
+          <h3>The top spot is wide open.</h3>
+          <p>Register free, get approved, then pay to climb the leaderboard. Starting at just ₦2,000 — stay visible to customers or drop as others overtake you.</p>
           <Link href="/register" className="btn-gold">Claim the #1 spot →</Link>
          </div> :
          <div className="landing-rows">
@@ -189,20 +189,21 @@ export default async function HomePage({searchParams}:{searchParams:Promise<Sear
     <section className="landing-cta-band">
       <div className="landing-cta-inner">
         <div>
-          <h2>Pay to rank. <em>Get seen.</em></h2>
-          <p>Every verified payment pushes your business up the leaderboard. The more you earn through OUTBIDLY, the higher you climb. Top 10 get badges that prove you're the real deal.</p>
+          <h2>Pay to stay visible. <em>Get discovered.</em></h2>
+          <p>Your business gets a free profile on OUTBIDLY. But to stay on the leaderboard and be seen by customers, you need verified payments. Every payment boosts your ranking. Keep investing to maintain your position — or drop down as others overtake you.</p>
         </div>
         <div className="landing-cta-pricing">
           <div className="landing-price-card">
             <div className="landing-price-tag">₦2,000</div>
             <div className="landing-price-label">Minimum to rank</div>
             <ul>
-              <li>✓ Get a verified ranking</li>
-              <li>✓ Appear on the leaderboard</li>
+              <li>✓ Get on the leaderboard</li>
+              <li>✓ Appear in search results</li>
               <li>✓ Get discovered by customers</li>
               <li>✓ Earn a top-10 badge</li>
+              <li>✓ Keep paying to stay on top</li>
             </ul>
-            <Link href="/register" className="btn-gold-lg">Start ranking →</Link>
+            <Link href="/register" className="btn-gold-lg">Register free & start →</Link>
           </div>
         </div>
       </div>
@@ -215,13 +216,13 @@ export default async function HomePage({searchParams}:{searchParams:Promise<Sear
         <h2>Three steps to <em>the top.</em></h2>
       </div>
       <div className="landing-steps">
-        <div><span>01</span><h3>Register free</h3><p>Create your business profile. No website needed.</p></div>
+        <div><span>01</span><h3>Register free</h3><p>Create your business profile at no cost. No website needed.</p></div>
         <div className="landing-step-arrow">→</div>
-        <div><span>02</span><h3>Get approved</h3><p>Our team reviews your business before it goes live.</p></div>
+        <div><span>02</span><h3>Get approved & listed</h3><p>Our team reviews your business, then you appear on the leaderboard.</p></div>
         <div className="landing-step-arrow">→</div>
-        <div><span>03</span><h3>Pay to rank</h3><p>Receive verified payments and climb the leaderboard in real-time.</p></div>
+        <div><span>03</span><h3>Pay to climb & stay visible</h3><p>Receive verified payments to boost your rank. Keep investing to maintain your position.</p></div>
       </div>
-      <Link href="/register" className="btn-gold" style={{marginTop:30}}>Get started — it's free →</Link>
+      <Link href="/register" className="btn-gold" style={{marginTop:30}}>Register free — get discovered →</Link>
     </section>
   </div>;
 }
