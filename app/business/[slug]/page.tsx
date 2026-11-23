@@ -2,6 +2,39 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { WhatsAppButton } from '@/components/whatsapp-button';
+import { ShareButtons } from '@/components/share-buttons';
+import type { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const db = await supabase();
+  if (!db) return { title: 'Business Profile' };
+  const { data: b } = await db.from('public_businesses').select('name,description,city,country,logo_url,slug').eq('slug', slug).maybeSingle();
+  if (!b) return { title: 'Business Not Found' };
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://outbidly.vercel.app';
+  const ogImage = b.logo_url
+    ? (b.logo_url.startsWith('https://') ? b.logo_url : db.storage.from('business-logos').getPublicUrl(b.logo_url).data.publicUrl)
+    : `${appUrl}/api/og/business?name=${encodeURIComponent(b.name)}&city=${encodeURIComponent(b.city)}&country=${encodeURIComponent(b.country)}`;
+  return {
+    title: `${b.name} — ${b.city}, ${b.country}`,
+    description: `${b.description || `Discover ${b.name} on OUTBIDLY, the business visibility platform. Based in ${b.city}, ${b.country}.`}`,
+    openGraph: {
+      title: `${b.name} | OUTBIDLY`,
+      description: `${b.description || `Discover ${b.name} on OUTBIDLY. ${b.city}, ${b.country}.`} Register free. Pay to rank.`,
+      url: `${appUrl}/business/${b.slug}`,
+      siteName: 'OUTBIDLY',
+      images: [{ url: ogImage, width: 1200, height: 630, alt: `${b.name} on OUTBIDLY` }],
+      locale: 'en_NG',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${b.name} | OUTBIDLY`,
+      description: b.description || `Discover ${b.name} on OUTBIDLY. ${b.city}, ${b.country}.`,
+      images: [ogImage],
+    },
+  };
+}
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -61,30 +94,16 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
             <h3 style={{ fontSize: 14, marginBottom: 10 }}>Follow us</h3>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               {socialLinks.map((s: any) => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    padding: '10px 16px',
-                    background: '#1a2a3a',
-                    color: '#fff',
-                    borderRadius: 6,
-                    fontSize: 13,
-                    fontWeight: 600,
-                    textDecoration: 'none',
-                  }}
-                >
+                <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 16px', background: '#1a2a3a', color: '#fff', borderRadius: 6, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>
                   <span>{s.icon}</span> {s.label} ↗
                 </a>
               ))}
             </div>
           </div>
         )}
+
+        {/* Social Sharing */}
+        <ShareButtons businessName={b.name} businessSlug={b.slug} city={b.city} country={b.country} />
 
         {showPayToRank && (
           <div className="notice" style={{ background: 'var(--accent-soft)', border: '2px solid var(--accent)' }}>
