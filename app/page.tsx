@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import {ArrowDownRight, ArrowRight, ArrowUpRight, Globe2, Search, ShieldCheck, Sparkles, Trophy} from 'lucide-react';
+import {ArrowUpRight, Crown, Flame, Globe2, Search, Sparkles, TrendingUp, Trophy, Zap} from 'lucide-react';
 import {categories as fallbackCategories} from '@/lib/categories';
 import {supabase} from '@/lib/supabase';
 
@@ -20,11 +20,11 @@ export default async function HomePage({searchParams}:{searchParams:Promise<Sear
   const db = await supabase();
   const categoryResult = db ? await db.from('categories').select('name').eq('active',true).order('name') : null;
   const names = categoryResult?.data?.map(item=>item.name) ?? fallbackCategories;
-  const result = db && !needsLocation ? await db.rpc('public_leaderboard',{
+  const result = db && !needsLocation ? await db.rpc('public_leaderboard_with_rank',{
     p_category:category, p_period:period, p_scope:scope,
     p_country:country || null, p_city:city || null, p_search:search || null,
   }) : null;
-  const leaders: Leader[] = result?.data || [];
+  const leaders: (Leader & {rank:number})[] = result?.data || [];
   const profilesResult = db && leaders.length ? await db.from('public_businesses').select('id,description,logo_url').in('id',leaders.map(x=>x.business_id)) : null;
   const profiles = new Map<string,Profile>((profilesResult?.data || []).map(p=>[p.id,p]));
   const unavailable = !db || !!result?.error || !!profilesResult?.error;
@@ -33,41 +33,195 @@ export default async function HomePage({searchParams}:{searchParams:Promise<Sear
     if (country) params.set('country',country);
     if (city) params.set('city',city);
     if (search) params.set('search',search);
-    return '/?'+params.toString()+'#leaderboard';
+    return '/?'+params.toString();
   };
-  return <div className="board-home">
-    <section className="board-intro board-width">
-      <div className="board-kicker"><span className="board-kicker-dot"/> THE BUSINESS VISIBILITY LEADERBOARD</div>
-      <h1>Make your business <em>impossible to miss.</em></h1>
-      <p>Discover ambitious businesses and explore the rankings, from your city to the world.</p>
-      <div className="board-intro-actions"><Link className="button board-primary" href="/register">Register your business <ArrowUpRight size={16}/></Link><Link href="/about" className="board-learn">How OUTBIDLY works <ArrowRight size={15}/></Link></div>
-      <div className="board-free"><ShieldCheck size={15}/> Free to register <span>·</span> No website required</div>
-    </section>
+  const filledSlots = leaders.length;
+  const topTenSlots = 10;
+  const openSlots = topTenSlots - Math.min(filledSlots, topTenSlots);
 
-    <section className="board-width board-main" id="leaderboard" aria-labelledby="leaderboard-heading">
-      <div className="board-heading"><div><div className="eyebrow">✦ DISCOVER THE LEADERBOARD</div><h2 id="leaderboard-heading">The businesses <em>making moves.</em></h2><p>See the standings in your industry, wherever you are.</p></div><Link className="board-directory-link" href="/businesses">Explore businesses <ArrowUpRight size={16}/></Link></div>
-      <nav className="board-tabs" aria-label="Ranking period">{periods.map(p=><Link key={p.value} href={periodLink(p.value)} className={period===p.value?'selected':''} aria-current={period===p.value?'page':undefined}>{p.label}</Link>)}</nav>
-      <form action="/#leaderboard" className="board-filter">
-        <input type="hidden" name="period" value={period}/>
-        <label>Category<select name="category" defaultValue={category}>{!names.includes(category)&&<option value={category}>{category}</option>}{names.map(name=><option key={name} value={name}>{name}</option>)}</select></label>
-        <label>Location<select name="scope" defaultValue={scope}><option value="global">Global</option><option value="country">Country</option><option value="city">City</option></select></label>
-        <label>Country<input name="country" defaultValue={country} placeholder="e.g. Nigeria"/></label>
-        <label>City<input name="city" defaultValue={city} placeholder="e.g. Lagos"/></label>
-        <label className="board-search">Search<input name="search" defaultValue={search} placeholder="Business name"/></label>
-        <button className="button board-filter-button" type="submit"><Search size={15}/> Apply</button>
-      </form>
-      <div className="board-explainer"><ShieldCheck size={17}/><span>Rankings reflect accumulated verified payments—not quality, customer satisfaction or endorsement. One payment counts across the relevant city, country and global periods.</span></div>
-      <div className="board-panel">
-        <div className="board-panel-header"><div><span className="board-panel-icon"><Trophy size={19}/></span><div><strong>{category}</strong><small>{scope === 'global' ? 'Global' : scope === 'country' ? country || 'Choose a country' : [city,country].filter(Boolean).join(', ') || 'Choose a city'} · {periods.find(p=>p.value===period)?.label} · UTC</small></div></div><Link href={periodLink(period)} className="board-refresh">Refresh ↻</Link></div>
-        {needsLocation ? <div className="board-empty"><span className="board-empty-icon"><Globe2 size={25}/></span><h3>Choose a location to explore.</h3><p>Enter {scope==='city'?'a country and city':'a country'} above and apply your filters.</p></div> : unavailable ? <div className="board-empty"><span className="board-empty-icon"><Trophy size={25}/></span><h3>Rankings are temporarily unavailable.</h3><p>Please try again a little later.</p></div> : leaders.length===0 ? <div className="board-empty"><span className="board-empty-icon"><Trophy size={25}/></span><h3>There’s room at the top.</h3><p>No verified contributions for this view yet. Explore another category or register your business for free.</p><Link href="/register" className="button board-empty-button">Register your business <ArrowUpRight size={15}/></Link></div> : <ol className="board-list">{leaders.map((leader,index)=>{
-          const profile=profiles.get(leader.business_id);
-          const logo=profile?.logo_url && db ? (profile.logo_url.startsWith('https://') ? profile.logo_url : db.storage.from('business-logos').getPublicUrl(profile.logo_url).data.publicUrl) : null;
-          return <li className={'board-entry '+(index===0?'board-first':'')} key={leader.business_id}><span className="board-rank">#{index+1}</span><span className="board-avatar">{logo?<img src={logo} alt=""/>:leader.name.slice(0,1).toUpperCase()}</span><div className="board-entry-text"><Link href={'/business/'+leader.slug}>{leader.name} <ArrowUpRight size={14}/></Link>{profile?.description&&<p>{profile.description}</p>}<small>{leader.city}, {leader.country}</small></div><strong className="board-total">{leader.currency} {leader.total}</strong></li>;
-        })}</ol>}
+  return <div className="landing">
+    {/* Top bar — pay to rank */}
+    <div className="landing-ribbon">
+      <span><Zap size={13}/> <strong>PAY TO RANK</strong></span>
+      <span>₦2,000 minimum to claim a spot on the leaderboard</span>
+      <Link href="/register" className="landing-ribbon-cta">Register now <ArrowUpRight size={13}/></Link>
+    </div>
+
+    {/* Hero — the leaderboard IS the hero */}
+    <section className="landing-hero">
+      <div className="landing-hero-inner">
+        <div className="landing-hero-left">
+          <div className="landing-eyebrow"><Trophy size={14}/> LIVE LEADERBOARD</div>
+          <h1>Who's <em>on top?</em></h1>
+          <p>Real-time rankings powered by verified payments. Every naira counts. Climb the board or get left behind.</p>
+          <div className="landing-hero-stats">
+            <div><span className="landing-stat-num">{filledSlots}</span><span className="landing-stat-label">Businesses ranked</span></div>
+            <div><span className="landing-stat-num">{openSlots > 0 ? openSlots : 0}</span><span className="landing-stat-label">Open top-10 spots</span></div>
+            <div><span className="landing-stat-num">₦2k</span><span className="landing-stat-label">Minimum to rank</span></div>
+          </div>
+          <div className="landing-hero-actions">
+            <Link className="btn-gold" href="/register"><Flame size={15}/> Rank your business</Link>
+            <Link className="btn-ghost" href="#leaderboard">View full rankings</Link>
+          </div>
+        </div>
+        <div className="landing-hero-right">
+          <div className="landing-mini-board">
+            <div className="landing-mini-header">
+              <span><Crown size={14}/> Top 10 — {category}</span>
+              <span className="landing-live-dot"/>
+            </div>
+            {unavailable ? <div className="landing-mini-empty">Rankings loading...</div> :
+             leaders.length === 0 ? <div className="landing-mini-empty">
+              <p>No businesses ranked yet in this category.</p>
+              <Link href="/register" className="btn-gold-sm">Be the first →</Link>
+             </div> :
+             <ol className="landing-mini-list">
+              {leaders.slice(0,5).map((leader,i) => {
+                const profile = profiles.get(leader.business_id);
+                return <li key={leader.business_id} className={i===0?'landing-mini-first':''}>
+                  <span className="landing-mini-rank">{leader.rank <= 3 ? ['🥇','🥈','🥉'][leader.rank-1] : '#'+leader.rank}</span>
+                  <span className="landing-mini-name">{leader.name}</span>
+                  <span className="landing-mini-total">{leader.currency} {Number(leader.total).toLocaleString()}</span>
+                </li>;
+              })}
+              {Array.from({length: Math.max(0, 5 - leaders.length)}).map((_,i) =>
+                <li key="empty" className="landing-mini-open">
+                  <span className="landing-mini-rank">#{leaders.length + i + 1}</span>
+                  <span className="landing-mini-name" style={{color:'#b8a87a'}}>Open spot</span>
+                  <Link href="/register" className="landing-mini-claim">Claim →</Link>
+                </li>
+              )}
+             </ol>}
+          </div>
+        </div>
       </div>
-      <div className="board-payment-note"><span><Sparkles size={16}/> Ranking payments are not available yet.</span><Link href="/faq">Read the FAQs <ArrowUpRight size={14}/></Link></div>
     </section>
 
-    <section className="board-how board-width" id="how-it-works"><div><div className="eyebrow">✦ GET DISCOVERED</div><h2>A little visibility.<br/><em>A lot of opportunity.</em></h2><p>Start with a free business profile. Once approved, it can be discovered by customers near and far.</p><Link href="/register" className="board-how-link">Create your profile <ArrowUpRight size={17}/></Link></div><div className="board-how-steps"><div><span>01</span><p><strong>Create a profile</strong>Share your business and choose your categories.</p><ArrowDownRight size={18}/></div><div><span>02</span><p><strong>Get approved</strong>Our team reviews your business before publication.</p><ArrowDownRight size={18}/></div><div><span>03</span><p><strong>Get discovered</strong>Your approved profile appears in the business directory.</p><ArrowUpRight size={18}/></div></div></section>
+    {/* Full leaderboard section */}
+    <section className="landing-board" id="leaderboard">
+      <div className="landing-board-head">
+        <div>
+          <div className="eyebrow">✦ THE STANDINGS</div>
+          <h2>Current <em>rankings.</em></h2>
+          <p>See every business competing for visibility. Top 10 get badges. Pay to climb.</p>
+        </div>
+        <Link className="btn-dark-sm" href="/register"><Sparkles size={14}/> Pay to rank →</Link>
+      </div>
+
+      {/* Filters */}
+      <div className="landing-filters">
+        <nav className="landing-tabs">{periods.map(p=><Link key={p.value} href={periodLink(p.value)} className={period===p.value?'on':''}>{p.label}</Link>)}</nav>
+        <form action="/" className="landing-filter-row">
+          <input type="hidden" name="period" value={period}/>
+          <select name="category" defaultValue={category} aria-label="Category">{!names.includes(category)&&<option value={category}>{category}</option>}{names.map(n=><option key={n}>{n}</option>)}</select>
+          <select name="scope" defaultValue={scope} aria-label="Scope"><option value="global">Global</option><option value="country">Country</option><option value="city">City</option></select>
+          <input name="country" defaultValue={country} placeholder="Country"/>
+          <input name="city" defaultValue={city} placeholder="City"/>
+          <input name="search" defaultValue={search} placeholder="Search..."/>
+          <button type="submit" className="btn-apply"><Search size={14}/> Go</button>
+        </form>
+      </div>
+
+      {/* Board */}
+      <div className="landing-panel">
+        <div className="landing-panel-top">
+          <div><Trophy size={18}/> <strong>{category}</strong> · {scope==='global'?'Global':scope==='country'?country||'Country':[city,country].filter(Boolean).join(', ')||'City'} · {periods.find(p=>p.value===period)?.label}</div>
+          <span className="landing-live-badge"><span className="landing-live-dot-sm"/>LIVE</span>
+        </div>
+
+        {needsLocation ? <div className="landing-empty"><Globe2 size={28}/><h3>Choose a location</h3><p>Select a country or city above to see local rankings.</p></div> :
+         unavailable ? <div className="landing-empty"><Trophy size={28}/><h3>Rankings temporarily unavailable</h3><p>Please try again shortly.</p></div> :
+         leaders.length === 0 ? <div className="landing-empty">
+          <Crown size={32}/>
+          <h3>The top spot is waiting.</h3>
+          <p>No businesses ranked in this view yet. Be the first to claim it — just ₦2,000 to start.</p>
+          <Link href="/register" className="btn-gold">Claim the #1 spot →</Link>
+         </div> :
+         <div className="landing-rows">
+          {leaders.map((leader) => {
+            const profile = profiles.get(leader.business_id);
+            const logo = profile?.logo_url && db ? (profile.logo_url.startsWith('https://') ? profile.logo_url : db.storage.from('business-logos').getPublicUrl(profile.logo_url).data.publicUrl) : null;
+            const rank = leader.rank;
+            const tier = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : rank <= 10 ? 'top10' : '';
+            return <Link href={'/business/'+leader.slug} className={'landing-row landing-row-'+tier} key={leader.business_id}>
+              <div className={'landing-row-medal'+(tier?' landing-medal-'+tier:'')}>
+                {rank <= 3 ? ['🥇','🥈','🥉'][rank-1] : <span>#{rank}</span>}
+              </div>
+              <div className="landing-row-avatar">
+                {logo ? <img src={logo} alt=""/> : leader.name.slice(0,1).toUpperCase()}
+              </div>
+              <div className="landing-row-info">
+                <span className="landing-row-name">{leader.name} <ArrowUpRight size={12}/></span>
+                {profile?.description && <span className="landing-row-desc">{profile.description}</span>}
+                <span className="landing-row-loc">{leader.city}, {leader.country}</span>
+              </div>
+              <div className="landing-row-right">
+                <span className="landing-row-amount">{leader.currency} {Number(leader.total).toLocaleString('en-NG',{minimumFractionDigits:2})}</span>
+                {rank <= 3 && <span className={'landing-row-badge landing-badge-'+tier}>{rank===1?'GOLD #1':rank===2?'SILVER #2':'BRONZE #3'}</span>}
+              </div>
+            </Link>;
+          })}
+          {/* Open spots teaser */}
+          {openSlots > 0 && leaders.length < 10 && Array.from({length: openSlots}).map((_,i) =>
+            <div className="landing-row landing-row-open" key={'open-'+i}>
+              <div className="landing-row-medal"><span>#{leaders.length + i + 1}</span></div>
+              <div className="landing-row-avatar landing-row-avatar-empty">?</div>
+              <div className="landing-row-info">
+                <span className="landing-row-name" style={{color:'#b8a87a'}}>Open spot</span>
+                <span className="landing-row-loc">This position is available</span>
+              </div>
+              <div className="landing-row-right">
+                <Link href="/register" className="landing-row-claim">Claim this rank →</Link>
+              </div>
+            </div>
+          )}
+         </div>
+        }
+      </div>
+
+      {/* Ranking explainer */}
+      <div className="landing-explainer">
+        <div><Sparkles size={15}/> Rankings are based on total verified payments received — not quality or endorsements. Each verified payment counts once across global, country and city periods.</div>
+      </div>
+    </section>
+
+    {/* Pay to Rank CTA band */}
+    <section className="landing-cta-band">
+      <div className="landing-cta-inner">
+        <div>
+          <h2>Pay to rank. <em>Get seen.</em></h2>
+          <p>Every verified payment pushes your business up the leaderboard. The more you earn through OUTBIDLY, the higher you climb. Top 10 get badges that prove you're the real deal.</p>
+        </div>
+        <div className="landing-cta-pricing">
+          <div className="landing-price-card">
+            <div className="landing-price-tag">₦2,000</div>
+            <div className="landing-price-label">Minimum to rank</div>
+            <ul>
+              <li>✓ Get a verified ranking</li>
+              <li>✓ Appear on the leaderboard</li>
+              <li>✓ Get discovered by customers</li>
+              <li>✓ Earn a top-10 badge</li>
+            </ul>
+            <Link href="/register" className="btn-gold-lg">Start ranking →</Link>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* How it works */}
+    <section className="landing-how">
+      <div className="landing-how-head">
+        <div className="eyebrow">✦ HOW IT WORKS</div>
+        <h2>Three steps to <em>the top.</em></h2>
+      </div>
+      <div className="landing-steps">
+        <div><span>01</span><h3>Register free</h3><p>Create your business profile. No website needed.</p></div>
+        <div className="landing-step-arrow">→</div>
+        <div><span>02</span><h3>Get approved</h3><p>Our team reviews your business before it goes live.</p></div>
+        <div className="landing-step-arrow">→</div>
+        <div><span>03</span><h3>Pay to rank</h3><p>Receive verified payments and climb the leaderboard in real-time.</p></div>
+      </div>
+      <Link href="/register" className="btn-gold" style={{marginTop:30}}>Get started — it's free →</Link>
+    </section>
   </div>;
 }
