@@ -25,7 +25,7 @@ export default async function HomePage({searchParams}:{searchParams:Promise<Sear
     p_country:country || null, p_city:city || null, p_search:search || null,
   }) : null;
   const leaders: (Leader & {rank:number})[] = result?.data || [];
-  const profilesResult = db && leaders.length ? await db.from('businesses').select('id,description,logo_url').in('id',leaders.map(x=>x.business_id)) : null;
+  const profilesResult = db && leaders.length ? await db.from('public_businesses').select('id,description,logo_url').in('id',leaders.map(x=>x.business_id)) : null;
   const profiles = new Map<string,Profile>((profilesResult?.data || []).map(p=>[p.id,p]));
   const unavailable = !db || !!result?.error || !!profilesResult?.error;
   const periodLink = (value:string) => {

@@ -9,7 +9,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const db = await supabase();
   if (!db) return { title: 'Business Profile' };
-  const { data: b } = await db.from('businesses').select('name,description,city,country,logo_url,slug').eq('slug', slug).maybeSingle();
+  const { data: b } = await db.from('public_businesses').select('name,description,city,country,logo_url,slug').eq('slug', slug).maybeSingle();
   if (!b) return { title: 'Business Not Found' };
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://outbidly.vercel.app';
   const ogImage = b.logo_url
@@ -40,7 +40,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const { slug } = await params;
   const db = await supabase();
   if (!db) notFound();
-  const { data: b } = await db.from('businesses').select('*').eq('slug', slug).maybeSingle();
+  const { data: b } = await db.from('public_businesses').select('*').eq('slug', slug).maybeSingle();
   if (!b) notFound();
   const { data: { user } } = await db.auth.getUser();
   let isOwner = false;
