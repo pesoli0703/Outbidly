@@ -14,20 +14,29 @@ export default async function Page() {
   const db = await supabase();
   if (!db) return <div className="wrap page-body"><p>Service unavailable.</p></div>;
 
-  // Get current week's business of the week (most recent)
-  const { data: botw } = await db
-    .from('business_of_week')
-    .select('*, businesses(name, slug, city, country, description, logo_url, business_type)')
-    .order('week_start', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  let botw: any = null;
+  let pastWinners: any[] = [];
 
-  // Get past winners
-  const { data: pastWinners } = await db
-    .from('business_of_week')
-    .select('*, businesses(name, slug, city, country)')
-    .order('week_start', { ascending: false })
-    .limit(12);
+  try {
+    // Get current week's business of the week (most recent)
+    const botwResult = await db
+      .from('business_of_week')
+      .select('*, businesses(name, slug, city, country, description, logo_url, business_type)')
+      .order('week_start', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    botw = botwResult.data;
+
+    // Get past winners
+    const pastResult = await db
+      .from('business_of_week')
+      .select('*, businesses(name, slug, city, country)')
+      .order('week_start', { ascending: false })
+      .limit(12);
+    pastWinners = pastResult.data || [];
+  } catch (error) {
+    console.error('Business of week query failed:', error);
+  }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://outbidly.vercel.app';
 

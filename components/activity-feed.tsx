@@ -6,12 +6,20 @@ export async function ActivityFeed() {
   const db = await supabase();
   if (!db) return null;
 
-  // Get recent activities
-  const { data: activities } = await db
-    .from('activity_feed')
-    .select('*, businesses(name, slug)')
-    .order('created_at', { ascending: false })
-    .limit(20);
+  let activities: any[] = [];
+
+  try {
+    // Get recent activities
+    const result = await db
+      .from('activity_feed')
+      .select('*, businesses(name, slug)')
+      .order('created_at', { ascending: false })
+      .limit(20);
+    activities = result.data || [];
+  } catch (error) {
+    console.error('Activity feed query failed:', error);
+    return null;
+  }
 
   if (!activities || activities.length === 0) {
     return (
